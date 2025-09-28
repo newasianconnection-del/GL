@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Mata-Mata de Séries GLs - By LuiS</title>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #0a0a0a;
+  color: #fff;
+  text-align: center;
+  overflow-x: hidden;
+}
+h1 { margin-top: 2vh; font-size: 4vw; }
+
+.series-container { 
+  display: flex; 
+  justify-content: center; 
+  flex-wrap: wrap; 
+  gap: 3vw; 
+  margin-top: 3vh; 
+}
+
+.series-card { 
+  cursor: pointer; 
+  width: 18vw; 
+  max-width: 180px; 
+  transition: transform 0.3s; 
+  border-radius: 12px; 
+  overflow: hidden; 
+  border: 2px solid #444; 
+  background-color: #2b2b2b; 
+}
+
+.series-card:hover { 
+  transform: scale(1.05); 
+  box-shadow: 0 0 20px #FFD700; 
+}
+
+.series-card img { 
+  width: 100%; 
+  display: block; 
+}
+
+.series-card p { 
+  margin: 0.5em 0; 
+  font-size: 1em; 
+}
+
+#winner-container { 
+  position: relative; 
+  margin-top: 3vh; 
+  display: none; 
+  text-align: center; 
+  animation: fadeIn 2s forwards;
+}
+
+#winner-img { 
+  width: 20vw; 
+  max-width: 250px; 
+  vertical-align: middle; 
+  margin-right: 2vw; 
+  animation: glow 1.5s infinite alternate;
+}
+
+#winner-series-img { 
+  width: 18vw; 
+  max-width: 220px; 
+  vertical-align: middle; 
+  border-radius: 12px; 
+  box-shadow: 0 0 25px #FFD700; 
+}
+
+#winner-name { 
+  font-size: 6vw; 
+  max-font-size: 56px; 
+  color: #FFD700; 
+  font-weight: bold; 
+  margin-top: 2vh; 
+  text-shadow: 0 0 15px #FFD700, 0 0 25px #FF4500; 
+}
+
+table { 
+  margin: 3vh auto; 
+  border-collapse: collapse; 
+  width: 90%; 
+}
+
+th, td { 
+  border: 1px solid #555; 
+  padding: 0.5em 1em; 
+  font-size: 0.9em; 
+}
+
+th { background-color: #333; color: #FFD700; }
+td { background-color: #2b2b2b; }
+
+.firework { position: absolute; width: 2vw; height: 2vw; max-width:14px; max-height:14px; border-radius: 50%; pointer-events: none; animation: explode 1s ease-out forwards; }
+.particle { position: absolute; width: 1vw; height: 1vw; max-width:6px; max-height:6px; border-radius: 50%; pointer-events: none; animation: fall 2s linear forwards; }
+
+@keyframes explode { 0% { transform: scale(1); opacity: 1; } 100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; } }
+@keyframes fall { 0% { transform: translateY(0); opacity:1; } 100% { transform: translateY(700px); opacity:0; } }
+@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+@keyframes glow { from {filter: drop-shadow(0 0 10px #FFD700);} to {filter: drop-shadow(0 0 35px #FFD700);} }
+
+@media (max-width: 768px){
+  h1 { font-size: 6vw; }
+  .series-card { width: 40vw; }
+  #winner-img, #winner-series-img { width: 35vw; margin: 1vw; }
+  #winner-name { font-size: 10vw; }
+  table { font-size: 0.8em; }
+}
+</style>
+</head>
+<body>
+
+<h1>Mata-Mata de Séries GLs - By LuiS</h1>
+<div id="round-title">Batalha 1</div>
+<div class="series-container" id="series-container"></div>
+
+<div id="winner-container">
+  <img id="winner-img" src="https://i.imgur.com/h6RPr51.png" alt="Troféu">
+  <img id="winner-series-img" src="" alt="GL Vencedor">
+  <div id="winner-name"></div>
+</div>
+
+<h2>Histórico de Confrontos</h2>
+<table id="history-table">
+  <thead>
+    <tr>
+      <th>Rodada</th>
+      <th>Confronto</th>
+      <th>Vencedor</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<audio id="winner-sound" src="https://cdn.pixabay.com/download/audio/2025/06/26/audio_0ef82a1331.mp3?filename=victory-chime-366449.mp3" preload="auto"></audio>
+<audio id="click-sound" src="https://www.fesliyanstudios.com/play-mp3/387" preload="auto"></audio>
+
+<script>
+const seriesList = [
+  {name: "Queendom", img: "https://i.imgur.com/SYtHmXd.jpeg"},
+  {name: "Pluto", img: "https://i.imgur.com/Qltq2kJ.jpeg"},
+  {name: "Reverse with Me", img: "https://i.imgur.com/nM6jKSk.jpeg"},
+  {name: "Us The Series", img: "https://i.imgur.com/2A8w6qk.jpeg"},
+  {name: "Only You", img: "https://i.imgur.com/sCoTHLp.jpeg"},
+  {name: "Whale Store", img: "https://i.imgur.com/OG9cIIh.jpeg"},
+  {name: "Somewhere Somehow", img: "https://i.imgur.com/n5OpLu6.jpeg"},
+  {name: "Denied Love", img: "https://i.imgur.com/Pm3MBZY.jpeg"},
+  {name: "The Secret Of Us", img: "https://i.imgur.com/8ESBLiX.jpeg"},
+  {name: "Harmony Secret", img: "https://i.imgur.com/65bfKtK.jpeg"},
+  {name: "Roller Coaster", img: "https://i.imgur.com/STRpw6e.jpeg"},
+  {name: "Reverse 4 You", img: "https://i.imgur.com/i8yw3RH.jpeg"},
+  {name: "The Royal Pin", img: "https://i.imgur.com/TTU42Be.jpeg"},
+  {name: "GAP The Series", img: "https://i.imgur.com/MLPnrBB.jpeg"},
+  {name: "Affair", img: "https://i.imgur.com/QeCcpaX.jpeg"},
+  {name: "Blank", img: "https://i.imgur.com/HJOAwwq.jpeg"},
+  {name: "My Marvellous Dream Is You", img: "https://i.imgur.com/B5xWH6i.jpeg"},
+  {name: "23.5", img: "https://i.imgur.com/gDX4Qhw.jpeg"},
+  {name: "Apple My Love", img: "https://i.imgur.com/ZUoJiOY.jpeg"},
+  {name: "Petrichor", img: "https://i.imgur.com/adpA5wo.jpeg"},
+  {name: "Love Senior", img: "https://i.imgur.com/FJJ2W14.jpeg"},
+  {name: "Mate", img: "https://i.imgur.com/72PV84U.jpeg"}
+];
+
+let currentRound = [];
+let nextRound = [];
+let roundNumber = 1;
+let history = [];
+
+function shuffle(array){ return array.sort(()=>Math.random()-0.5); }
+
+function startRound(){
+  if(currentRound.length===0 && nextRound.length===1){ showWinner(nextRound[0]); return; }
+  if(currentRound.length===0){ currentRound=shuffle(nextRound); nextRound=[]; roundNumber++; }
+  showPair();
+}
+
+function showPair(){
+  const container=document.getElementById("series-container");
+  container.innerHTML="";
+  if(currentRound.length===1){ nextRound.push(currentRound.pop()); startRound(); return; }
+  const s1=currentRound.pop(); const s2=currentRound.pop();
+  container.appendChild(createSeriesElement(s1,s2));
+  container.appendChild(createSeriesElement(s2,s1));
+}
+
+function createSeriesElement(series,opponent){
+  const card=document.createElement("div"); card.className="series-card";
+  card.onclick=()=>{
+    nextRound.push(series);
+    history.push({round:roundNumber,matchup:`${series.name} x ${opponent.name}`,winner:series.name});
+    updateHistoryTable();
+    document.getElementById("round-title").innerText=`Rodada ${roundNumber}`;
+    document.getElementById("click-sound").play();
+    startRound();
+  };
+  const img=document.createElement("img"); img.src=series.img; img.alt=series.name;
+  const p=document.createElement("p"); p.textContent=series.name;
+  card.appendChild(img); card.appendChild(p);
+  return card;
+}
+
+function updateHistoryTable(){
+  const tbody=document.querySelector("#history-table tbody"); tbody.innerHTML="";
+  history.forEach(h=>{
+    const tr=document.createElement("tr"); tr.innerHTML=`<td>${h.round}</td><td>${h.matchup}</td><td>${h.winner}</td>`; tbody.appendChild(tr);
+  });
+}
+
+function showWinner(series){
+  document.getElementById("series-container").style.display="none";
+  const winnerContainer=document.getElementById("winner-container");
+  winnerContainer.style.display="block";
+  document.getElementById("winner-name").textContent=series.name;
+  document.getElementById("winner-series-img").src = series.img;
+  const sound = document.getElementById("winner-sound");
+  sound.currentTime = 0;
+  sound.play();
+  setInterval(()=>createFirework(),70);
+  setInterval(()=>createParticle(),70);
+}
+
+function createFirework(){
+  const f=document.createElement("div"); f.className="firework";
+  const colors=["#FFD700","#FF4500","#00BFFF","#FF69B4","#7CFC00","#ADFF2F","#FF6347"];
+  f.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];
+  const x=(Math.random()*window.innerWidth - window.innerWidth/2)+"px";
+  const y=(Math.random()*window.innerHeight - window.innerHeight/2)+"px";
+  f.style.setProperty('--x',x); f.style.setProperty('--y',y);
+  document.body.appendChild(f); setTimeout(()=>f.remove(),1200);
+}
+
+function createParticle(){
+  const p=document.createElement("div"); p.className="particle";
+  const colors=["#FFD700","#FF4500","#00BFFF","#FF69B4","#7CFC00","#ADFF2F","#FF6347"];
+  p.style.backgroundColor=colors[Math.floor(Math.random()*colors.length)];
+  p.style.left = Math.random()*window.innerWidth+"px";
+  p.style.top = "-10px";
+  document.body.appendChild(p);
+  setTimeout(()=>p.remove(),2000);
+}
+
+currentRound = shuffle([...seriesList]);
+startRound();
+</script>
+</body>
+</html>
